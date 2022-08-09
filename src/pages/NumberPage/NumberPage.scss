@@ -1,0 +1,18 @@
+.NumberPage-Pages {
+  flex-wrap: wrap;
+  gap: 24px;
+  display: flex;
+  width: calc(160px * 4 + 24px * 3);
+  margin: 40px auto 0;
+  // height: 100%;
+}
+
+.NumberPage-Page {
+  display: flex;
+  // height: 100px;
+  // width: 40px;
+
+  img {
+    width: 160px;
+  }
+}

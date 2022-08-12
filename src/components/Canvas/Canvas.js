@@ -25,60 +25,60 @@ export const Canvas = observer(({ id }) => {
       redraw();
     }
 
-    canvasRef.current.addEventListener('mousedown', (event) => {
-      mousedown = true;
+    // canvasRef.current.addEventListener('mousedown', (event) => {
+    //   mousedown = true;
 
-      box.x1 = event.pageX;
-      box.y1 = event.pageY;
-    });
+    //   box.x1 = event.pageX;
+    //   box.y1 = event.pageY;
+    // });
 
-    canvasRef.current.addEventListener('mousemove', (event) => {
-      if (mousedown) {
-        box.x2 = event.pageX;
-        box.y2 = event.pageY;
-        redraw();
-      }
-    });
+    // canvasRef.current.addEventListener('mousemove', (event) => {
+    //   if (mousedown) {
+    //     box.x2 = event.pageX;
+    //     box.y2 = event.pageY;
+    //     redraw();
+    //   }
+    // });
 
-    canvasRef.current.addEventListener('mouseup', (event) => {
-      mousedown = false;
-      boxes.push({ x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2 });
-      redraw();
-    });
+    // canvasRef.current.addEventListener('mouseup', (event) => {
+    //   mousedown = false;
+    //   boxes.push({ x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2 });
+    //   redraw();
+    // });
   }, []);
 
   const redraw = () => {
     const context = canvasRef.current.getContext('2d');
 
-    window.context = context;
+  //   window.context = context;
 
-    context.clearRect(0, 0, WIDTH, HEIGHT);
-    context.beginPath();
+  //   context.clearRect(0, 0, WIDTH, HEIGHT);
+  //   context.beginPath();
     context.drawImage(image, 0, 0);
 
-    if (mousedown) {
-      drowBox(box);
-    }
+  //   if (mousedown) {
+  //     drowBox(box);
+  //   }
 
-    for (let box of boxes) {
-      drowBox(box);
-    }
+  //   for (let box of boxes) {
+  //     drowBox(box);
+  //   }
   }
 
-  const drowBox = (box) => {
-    const context = canvasRef.current.getContext('2d');
+  // const drowBox = (box) => {
+  //   const context = canvasRef.current.getContext('2d');
 
-    context.beginPath();
-    context.rect(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
-    // context.stroke();
-    context.globalAlpha = 0.2;
-    context.fill();
-    context.globalAlpha = 1;
-  }
+  //   context.beginPath();
+  //   context.rect(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
+  //   // context.stroke();
+  //   context.globalAlpha = 0.2;
+  //   context.fill();
+  //   context.globalAlpha = 1;
+  // }
 
   return (
     <div className='Canvas'>
       <canvas width={WIDTH} height={HEIGHT} ref={canvasRef}/>
     </div>
-  )  
+  )
 })

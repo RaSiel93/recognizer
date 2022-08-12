@@ -1,7 +1,7 @@
 import './App.css';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import { NumberPage, PagePage } from './pages';
+import { NumberPage, PagePage } from 'pages';
 
 
 function App() {

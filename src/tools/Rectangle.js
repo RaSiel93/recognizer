@@ -8,9 +8,9 @@ export default class Rectangle extends Tool {
   }
 
   listen() {
-    this.canvas.onmousemove = this.mouseMoveHandler.bind(this);
-    this.canvas.onmousedown = this.mouseDownHandler.bind(this);
-    this.canvas.onmouseup = this.mouseUpHandler.bind(this);
+    this.canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this));
+    this.canvas.addEventListener('mousedown', this.mouseDownHandler.bind(this));
+    this.canvas.addEventListener('mouseup', this.mouseUpHandler.bind(this));
   }
 
   mouseMoveHandler(e) {

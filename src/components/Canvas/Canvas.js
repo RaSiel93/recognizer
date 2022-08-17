@@ -13,7 +13,8 @@ export const Canvas = observer(({ id }) => {
   const [image, setImage] = useState(new Image());
   const [imageLoaded, setImageLoaded] = useState(false);
 
-  const { boxes, temporaryBox } = canvasState;
+  const { boxes, temporaryBox, selectedBoxId } = canvasState;
+  console.log('Canvas boxes', boxes.length)
 
   useEffect(() => {
     canvasState.setCanvas(canvasRef.current);
@@ -21,8 +22,6 @@ export const Canvas = observer(({ id }) => {
     image.src = imageSrc;
     image.onload = () => setImageLoaded(true);
 
-    // canvasRef.current.addEventListener('dragenter', handleDragIn)
-    // canvasRef.current.addEventListener('dragleave', handleDragOut)
     canvasRef.current.addEventListener('dragover', handleDrag)
     canvasRef.current.addEventListener('drop', handleDrop)
   }, []);
@@ -31,19 +30,10 @@ export const Canvas = observer(({ id }) => {
     e.preventDefault()
     e.stopPropagation()
   }
-  // const handleDragIn = (e) => {
-  //   e.preventDefault()
-  //   e.stopPropagation()
-  // }
-  // const handleDragOut = (e) => {
-  //   e.preventDefault()
-  //   e.stopPropagation()
-  // }
+
   const handleDrop = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    // debugger
-    // console.log('test', e)
     const file = e.dataTransfer.files[0];
     var reader = new FileReader();
       reader.onloadend = function(e) {
@@ -57,21 +47,22 @@ export const Canvas = observer(({ id }) => {
     if (imageLoaded) {
       redraw();
     }
-  }, [imageLoaded, boxes, temporaryBox]);
+  }, [imageLoaded, boxes, temporaryBox, selectedBoxId]);
 
 
   const redraw = () => {
     drawImage();
-    window.boxes = boxes
 
-    for (let { x, y, w, h } of boxes) {
-      drawRectangle(x, y, w, h);
+    for (let { id, x, y, w, h } of boxes) {
+      const color = id === selectedBoxId ? '#FFBF00' : '#000000';
+
+      drawRectangle(x, y, w, h, color);
     }
 
     if (temporaryBox) {
       const { x, y, w, h } = temporaryBox;
 
-      drawRectangle(x, y, w, h);
+      drawRectangle(x, y, w, h, '#0000FF');
     }
   }
 
@@ -83,10 +74,13 @@ export const Canvas = observer(({ id }) => {
     context.drawImage(image, 0, 0, widthPosition, HEIGHT);
   }
 
-  const drawRectangle = (x, y, w, h) => {
+  const drawRectangle = (x, y, w, h, color = '#000') => {
     const context = canvasRef.current.getContext('2d');
 
+    // console.log('color', color, x, y, w, h)
+
     context.beginPath();
+    context.fillStyle = color;
     context.rect(x, y, w, h);
     context.globalAlpha = 0.2;
     context.fill();

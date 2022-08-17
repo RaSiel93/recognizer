@@ -1,18 +1,16 @@
 import { makeAutoObservable } from 'mobx';
 import { Rectangle } from 'tools';
+import { v4 as uuidv4 } from 'uuid';
 import api from 'shared/api';
-
-// import { BoxStore } from 'store/BoxStore';
 
 const HEIGHT = 600;
 const WIDTH = 400;
-
-// const boxStore = new BoxStore();
 
 class CanvasState {
 	canvas = null;
 	boxes = [];
 	temporaryBox = null;
+	selectedBoxId = null;
 
 	constructor() {
 		makeAutoObservable(this);
@@ -20,26 +18,60 @@ class CanvasState {
     api.getBoxes().then((response) => this.setBoxes(response));
 	}
 
-  // redraw() {
-  //   const { height, width } = this.image;
-  //   const widthPosition = HEIGHT / height * width;
-  //   // (WIDTH - widthPosition) / 2
+	listen() {
+		this.canvas.addEventListener('mousemove', this.mouseMoveHandler.bind(this));
+		this.canvas.addEventListener('click', this.clickHandler.bind(this));
+	}
 
-  //   this.ctx.drawImage(this.image, 0, 0, widthPosition, HEIGHT);
+	mouseMoveHandler(e) {
+		const { offsetX, offsetY } = e;
 
-  //   for (let { x, y, w, h } of this.boxes) {
-  //     this.rectangleDraw(x, y, w, h);
-  //   }
-  // }
+		const hoveredBox = this.findBox(offsetX, offsetY);
+
+		if (hoveredBox) {
+			const { x, y, w, h } = hoveredBox;
+
+			document.body.style.cursor = 'pointer';
+		} else {
+			document.body.style.cursor = 'auto';
+		}
+	}
+
+	findBox(offsetX, offsetY) {
+		return this.boxes.find(({ x, y, w, h }) => {
+			return offsetX >= x && offsetX <= (x + w) && offsetY >= y && offsetY <= (y + h)
+		})
+	}
+
+	clickHandler(e) {
+		const { offsetX, offsetY } = e;
+
+		const selectedBox = this.findBox(offsetX, offsetY);
+
+		if (selectedBox) {
+			this.setSelectedBoxId(selectedBox.id);
+		} else {
+			this.setSelectedBoxId(null);
+		}
+	}
 
   createBox() {
   	const { x, y, w, h } = this.temporaryBox;
 
     this.setTemporaryBox(null);
-  	this.boxes.push({ x, y, w, h });
+    this.setBoxes([
+    	...this.boxes,
+    	{
+		    id: uuidv4(),
+	  		x: (w > 0 ? x : x + w),
+	  		y: (h > 0 ? y : y + h),
+	  		w: Math.abs(w),
+	  		h: Math.abs(h)
+    	}
+    ]);
 
   	// api.saveBoxes(this.boxes);
-  	this.download(JSON.stringify(this.boxes), 'test.json', 'application/json');
+  	// this.download(JSON.stringify(this.boxes), 'test.json', 'application/json');
   }
 
   setBoxes(boxes) {
@@ -50,10 +82,15 @@ class CanvasState {
   	this.temporaryBox = value;
   }
 
+  setSelectedBoxId(id) {
+  	this.selectedBoxId = id;
+  }
+
 	setCanvas(canvas) {
 		this.canvas = canvas;
 		this.ctx = canvas.getContext('2d');
-		this.tool = new Rectangle(canvas, this, this.createBox.bind(this));
+		this.tool = new Rectangle(canvas, this);
+		this.listen();
 	}
 
   download = (content, fileName, contentType) => {

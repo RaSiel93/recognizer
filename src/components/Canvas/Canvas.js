@@ -3,70 +3,96 @@ import { observer } from 'mobx-react-lite';
 import canvasState from 'store/canvasState';
 import './Canvas.scss';
 
-const WIDTH = 600;
-const HEIGHT = 400;
+const WIDTH = 400;
+const HEIGHT = 600;
 
 export const Canvas = observer(({ id }) => {
-  let image;
-
   const canvasRef = useRef();
+  const imageSrc = `/numbers/1913/13/01.webp`;
 
-  // let mousedown = false;
-  // const box = { x1: 0, y1: 0, x2: 0, y2: 0 };
+  const [image, setImage] = useState(new Image());
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  const { boxes, temporaryBox } = canvasState;
 
   useEffect(() => {
     canvasState.setCanvas(canvasRef.current);
 
+    image.src = imageSrc;
+    image.onload = () => setImageLoaded(true);
 
-    // canvasRef.current.addEventListener('mousedown', (event) => {
-    //   mousedown = true;
-
-    //   box.x1 = event.pageX;
-    //   box.y1 = event.pageY;
-    // });
-
-    // canvasRef.current.addEventListener('mousemove', (event) => {
-    //   if (mousedown) {
-    //     box.x2 = event.pageX;
-    //     box.y2 = event.pageY;
-    //     redraw();
-    //   }
-    // });
-
-    // canvasRef.current.addEventListener('mouseup', (event) => {
-    //   mousedown = false;
-    //   boxes.push({ x1: box.x1, y1: box.y1, x2: box.x2, y2: box.y2 });
-    //   redraw();
-    // });
+    // canvasRef.current.addEventListener('dragenter', handleDragIn)
+    // canvasRef.current.addEventListener('dragleave', handleDragOut)
+    canvasRef.current.addEventListener('dragover', handleDrag)
+    canvasRef.current.addEventListener('drop', handleDrop)
   }, []);
 
-  // const redraw = () => {
-    // const context = canvasRef.current.getContext('2d');
-
-  //   window.context = context;
-
-  //   context.clearRect(0, 0, WIDTH, HEIGHT);
-  //   context.beginPath();
-
-  //   if (mousedown) {
-  //     drowBox(box);
-  //   }
-
-  //   for (let box of boxes) {
-  //     drowBox(box);
-  //   }
+  const handleDrag = (e) => {
+    e.preventDefault()
+    e.stopPropagation()
+  }
+  // const handleDragIn = (e) => {
+  //   e.preventDefault()
+  //   e.stopPropagation()
   // }
-
-  // const drowBox = (box) => {
-  //   const context = canvasRef.current.getContext('2d');
-
-  //   context.beginPath();
-  //   context.rect(box.x1, box.y1, box.x2 - box.x1, box.y2 - box.y1);
-  //   // context.stroke();
-  //   context.globalAlpha = 0.2;
-  //   context.fill();
-  //   context.globalAlpha = 1;
+  // const handleDragOut = (e) => {
+  //   e.preventDefault()
+  //   e.stopPropagation()
   // }
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    // debugger
+    // console.log('test', e)
+    const file = e.dataTransfer.files[0];
+    var reader = new FileReader();
+      reader.onloadend = function(e) {
+      var result = JSON.parse(this.result);
+      canvasState.setBoxes(result);
+    };
+    reader.readAsText(file);
+  }
+
+  useEffect(() => {
+    if (imageLoaded) {
+      redraw();
+    }
+  }, [imageLoaded, boxes, temporaryBox]);
+
+
+  const redraw = () => {
+    drawImage();
+    window.boxes = boxes
+
+    for (let { x, y, w, h } of boxes) {
+      drawRectangle(x, y, w, h);
+    }
+
+    if (temporaryBox) {
+      const { x, y, w, h } = temporaryBox;
+
+      drawRectangle(x, y, w, h);
+    }
+  }
+
+  const drawImage = () => {
+    const context = canvasRef.current.getContext('2d');
+    const { height, width } = image;
+    const widthPosition = HEIGHT / height * width;
+
+    context.drawImage(image, 0, 0, widthPosition, HEIGHT);
+  }
+
+  const drawRectangle = (x, y, w, h) => {
+    const context = canvasRef.current.getContext('2d');
+
+    context.beginPath();
+    context.rect(x, y, w, h);
+    context.globalAlpha = 0.2;
+    context.fill();
+    context.globalAlpha = 1;
+    context.stroke();
+  }
 
   return (
     <div className='Canvas'>

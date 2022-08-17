@@ -7,23 +7,16 @@ const WIDTH = 600;
 const HEIGHT = 400;
 
 export const Canvas = observer(({ id }) => {
-  let boxes = [];
   let image;
 
   const canvasRef = useRef();
-  // const imageRef = useRef();
 
-  let mousedown = false;
-  const box = { x1: 0, y1: 0, x2: 0, y2: 0 };
+  // let mousedown = false;
+  // const box = { x1: 0, y1: 0, x2: 0, y2: 0 };
 
   useEffect(() => {
     canvasState.setCanvas(canvasRef.current);
 
-    image = new Image();
-    image.src = `/numbers/1906/01/0${id}.jpg`;
-    image.onload = () => {
-      redraw();
-    }
 
     // canvasRef.current.addEventListener('mousedown', (event) => {
     //   mousedown = true;
@@ -47,14 +40,13 @@ export const Canvas = observer(({ id }) => {
     // });
   }, []);
 
-  const redraw = () => {
-    const context = canvasRef.current.getContext('2d');
+  // const redraw = () => {
+    // const context = canvasRef.current.getContext('2d');
 
   //   window.context = context;
 
   //   context.clearRect(0, 0, WIDTH, HEIGHT);
   //   context.beginPath();
-    context.drawImage(image, 0, 0);
 
   //   if (mousedown) {
   //     drowBox(box);
@@ -63,7 +55,7 @@ export const Canvas = observer(({ id }) => {
   //   for (let box of boxes) {
   //     drowBox(box);
   //   }
-  }
+  // }
 
   // const drowBox = (box) => {
   //   const context = canvasRef.current.getContext('2d');

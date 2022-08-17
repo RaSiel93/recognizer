@@ -12,7 +12,6 @@ class CanvasState {
 		this.canvas = canvas;
 
 		this.tool = new Rectangle(canvas);
-		console.log('test')
 	}
 }
 
